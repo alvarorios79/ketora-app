@@ -58,7 +58,7 @@ class _PerfilPageState extends State<PerfilPage> {
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
         decoration: BoxDecoration(
-          color: AppColors.blanco,
+          color: const Color(0xFF182318),
           borderRadius: BorderRadius.circular(24),
         ),
         child: Column(
@@ -134,7 +134,7 @@ class _PerfilPageState extends State<PerfilPage> {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xFF0D1510),
       body: _cargando
           ? const Center(child: CircularProgressIndicator(color: AppColors.verde))
           : CustomScrollView(
@@ -143,19 +143,14 @@ class _PerfilPageState extends State<PerfilPage> {
                 SliverAppBar(
                   expandedHeight: 220,
                   pinned: true,
-                  backgroundColor: AppColors.verdeOs,
+                  backgroundColor: Colors.black,
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back_rounded, color: AppColors.blanco),
                     onPressed: () => context.pop(),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
                     background: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppColors.verdeOs, AppColors.verde],
-                          begin: Alignment.topLeft, end: Alignment.bottomRight,
-                        ),
-                      ),
+                      color: Colors.black,
                       child: SafeArea(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -352,7 +347,7 @@ class _MacrosCard extends StatelessWidget {
             children: [
               Expanded(child: _MacroPill('${perfil.grasasG}g', 'Grasas', AppColors.macroGrasas)),
               const SizedBox(width: 10),
-              Expanded(child: _MacroPill('${perfil.proteinaG}g', 'Proteína', AppColors.macroProtein)),
+              Expanded(child: _MacroPill('${perfil.proteinaG}g', 'Proteína', AppColors.verdeMedio)),
               const SizedBox(width: 10),
               Expanded(child: _MacroPill('${perfil.carbosG}g', 'Carbos', AppColors.macroCarbos)),
             ],
@@ -393,7 +388,7 @@ class _SectionTitle extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Text(text,
-        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white)),
     );
   }
 }
@@ -406,7 +401,7 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.blanco,
+        color: const Color(0xFF182318),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 12)],
       ),
@@ -440,8 +435,8 @@ class _InfoRow extends StatelessWidget {
           child: Icon(icon, size: 18, color: AppColors.verde),
         ),
         const SizedBox(width: 14),
-        Expanded(child: Text(label, style: const TextStyle(fontSize: 14, color: AppColors.textSecondary))),
-        Text(valor, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 14, color: Color(0xFF8FAF8F)))),
+        Text(valor, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
       ]),
     );
   }
@@ -467,7 +462,7 @@ class _ActionRow extends StatelessWidget {
             child: Icon(icon, size: 18, color: AppColors.verde),
           ),
           const SizedBox(width: 14),
-          Expanded(child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary))),
+          Expanded(child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white))),
           const Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 20),
         ]),
       ),
@@ -534,7 +529,7 @@ class _EditarPerfilSheetState extends State<_EditarPerfilSheet> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.65,
       decoration: const BoxDecoration(
-        color: AppColors.blanco,
+        color: const Color(0xFF182318),
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.fromLTRB(24, 16, 24,
@@ -548,7 +543,7 @@ class _EditarPerfilSheetState extends State<_EditarPerfilSheet> {
           ),
           const SizedBox(height: 20),
           const Text('Editar perfil',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
           const SizedBox(height: 20),
 
           // Nombre
@@ -564,7 +559,7 @@ class _EditarPerfilSheetState extends State<_EditarPerfilSheet> {
 
           // Peso
           Text('Peso: ${_pesoKg.toStringAsFixed(1)} kg',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: AppColors.verde,
@@ -581,7 +576,7 @@ class _EditarPerfilSheetState extends State<_EditarPerfilSheet> {
 
           // Calorías
           Text('Calorías objetivo: $_kcal kcal/día',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: AppColors.oro,

@@ -145,22 +145,11 @@ class _OnboardingPageState extends State<OnboardingPage>
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // Fondo superior verde
-          Positioned(
-            top: 0, left: 0, right: 0,
-            height: size.height * 0.35,
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.verdeOs, AppColors.verde],
-                  begin: Alignment.topLeft, end: Alignment.bottomRight,
-                ),
-              ),
-            ),
-          ),
+          // Fondo negro sólido para toda la pantalla
+          Positioned.fill(child: Container(color: Colors.black)),
 
           // Contenido
           SafeArea(
@@ -168,7 +157,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               children: [
                 // Barra de progreso y controles
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
                   child: Row(
                     children: [
                       if (_paso > 0)
@@ -226,14 +215,8 @@ class _OnboardingPageState extends State<OnboardingPage>
                       if (i == 9) _calcularMacros();
                     },
                     children: [
-                      // Paso 0 — Bienvenida
-                      _Paso(
-                        emoji: '🥑',
-                        titulo: '¡Bienvenido a KETORA!',
-                        subtitulo: 'La app keto para hispanohablantes',
-                        body: _BienvenidaBody(onNombreChange: (v) => _nombre = v),
-                        colorFondo: AppColors.fondoVerde,
-                      ),
+                      // Paso 0 — Bienvenida imponente
+                      _BienvenidaImponente(onNombreChange: (v) => _nombre = v),
 
                       // Paso 1 — Sexo
                       _Paso(
@@ -410,6 +393,86 @@ class _OnboardingPageState extends State<OnboardingPage>
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Paso 0 — Bienvenida imponente
+// ─────────────────────────────────────────────────────────────────────────────
+class _BienvenidaImponente extends StatelessWidget {
+  final ValueChanged<String> onNombreChange;
+  const _BienvenidaImponente({required this.onNombreChange});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+      child: Column(
+        children: [
+          // Logo horizontal grande
+          Image.asset('assets/images/logo_horizontal.png',
+            width: double.infinity, height: 160, fit: BoxFit.contain),
+          const SizedBox(height: 4),
+
+          // Tagline
+          const Text('Tu guía keto en español',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, color: Color(0xFF8FAF8F), fontWeight: FontWeight.w500)),
+          const SizedBox(height: 16),
+
+          // Card de bienvenida oscura
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF182318),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0xFF2A3D2A)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text('¿Cómo te llamas?',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
+                const SizedBox(height: 4),
+                const Text('Personalizamos KETORA para ti',
+                  style: TextStyle(fontSize: 14, color: Color(0xFF8FAF8F))),
+                const SizedBox(height: 16),
+                TextField(
+                  onChanged: onNombreChange,
+                  textCapitalization: TextCapitalization.words,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Tu nombre',
+                    hintStyle: const TextStyle(color: Color(0xFF4A6B4A)),
+                    filled: true,
+                    fillColor: const Color(0xFF0D1510),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Features — grilla 2x2
+          Row(children: [
+            Expanded(child: _FeatureCard(Icons.eco_rounded, '🥑', 'Guía Keto', 'En español\npaso a paso', const Color(0xFF7CB518), const Color(0xFF0F2B18))),
+            const SizedBox(width: 10),
+            Expanded(child: _FeatureCard(Icons.auto_awesome_rounded, '✨', 'Coach IA', 'GEM responde\ncualquier duda', const Color(0xFF3B82F6), const Color(0xFF0F1B2B))),
+          ]),
+          const SizedBox(height: 10),
+          Row(children: [
+            Expanded(child: _FeatureCard(Icons.local_fire_department_rounded, '🔥', 'Ayuno 16:8', 'Quema grasa\nmientras ayunas', const Color(0xFFC9A227), const Color(0xFF1E1A0A))),
+            const SizedBox(width: 10),
+            Expanded(child: _FeatureCard(Icons.monitor_heart_rounded, '💪', 'Macros', 'Calorías y\nnutrientes al día', const Color(0xFFA855F7), const Color(0xFF1A0F2B))),
+          ]),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Wrapper de cada paso
 // ─────────────────────────────────────────────────────────────────────────────
 class _Paso extends StatelessWidget {
@@ -430,40 +493,20 @@ class _Paso extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
       child: Column(
         children: [
-          // Card superior con emoji
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.blanco,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 8))
-              ],
-            ),
-            child: Column(
-              children: [
-                emoji == '🥑'
-                  ? Image.asset('assets/images/logo_ketora.png', height: 100, fit: BoxFit.contain)
-                  : Container(
-                      width: 88, height: 88,
-                      decoration: BoxDecoration(color: colorFondo, shape: BoxShape.circle),
-                      child: Center(child: Text(emoji, style: const TextStyle(fontSize: 44))),
-                    ),
-                const SizedBox(height: 18),
-                Text(titulo,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-                const SizedBox(height: 6),
-                Text(subtitulo,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, color: AppColors.textSecondary, height: 1.4)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
+          Image.asset('assets/images/logo_horizontal.png',
+            width: double.infinity, height: 130, fit: BoxFit.contain),
+          const SizedBox(height: 10),
+          Text(titulo,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white)),
+          const SizedBox(height: 4),
+          Text(subtitulo,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF8FAF8F))),
+          const SizedBox(height: 16),
           body,
         ],
       ),
@@ -485,7 +528,7 @@ class _BienvenidaBody extends StatelessWidget {
       Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.blanco,
+          color: const Color(0xFF182318),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
         ),
@@ -501,7 +544,7 @@ class _BienvenidaBody extends StatelessWidget {
               hintText: 'Tu nombre',
               hintStyle: const TextStyle(color: AppColors.textHint),
               filled: true,
-              fillColor: AppColors.fondoGris,
+              fillColor: const Color(0xFF0D1510),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
               contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             ),
@@ -509,38 +552,50 @@ class _BienvenidaBody extends StatelessWidget {
           const SizedBox(height: 16),
           const Text('En KETORA te acompañamos en cada paso de tu camino keto. Sin tecnicismos, en tu idioma.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.5)),
+            style: TextStyle(fontSize: 14, color: const Color(0xFF8FAF8F), height: 1.5)),
         ]),
       ),
-      const SizedBox(height: 12),
-      _FeaturePill('🥑', 'Guía keto paso a paso en español'),
-      _FeaturePill('🤖', 'GEM — tu coach IA disponible 24/7'),
-      _FeaturePill('⏰', 'Timer de ayuno con notificaciones'),
-      _FeaturePill('📊', 'Seguimiento de macros y peso'),
     ]);
   }
 }
 
-class _FeaturePill extends StatelessWidget {
+class _FeatureCard extends StatelessWidget {
+  final IconData icono;
   final String emoji;
-  final String text;
-  const _FeaturePill(this.emoji, this.text);
+  final String titulo;
+  final String subtitulo;
+  final Color color;
+  final Color fondo;
+  const _FeatureCard(this.icono, this.emoji, this.titulo, this.subtitulo, this.color, this.fondo);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: AppColors.blanco,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6)],
+        color: fondo,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.35), width: 1.5),
       ),
-      child: Row(children: [
-        Text(emoji, style: const TextStyle(fontSize: 20)),
-        const SizedBox(width: 12),
-        Text(text, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary)),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36, height: 36,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icono, color: color, size: 20),
+          ),
+          const SizedBox(height: 8),
+          Text(titulo,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color)),
+          const SizedBox(height: 2),
+          Text(subtitulo,
+            style: const TextStyle(fontSize: 10, color: Color(0xFF8FAF8F), height: 1.3)),
+        ],
+      ),
     );
   }
 }
@@ -575,31 +630,40 @@ class _OpcionesBody extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             margin: const EdgeInsets.only(bottom: 10),
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: modoDescripcion ? 14 : 18),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: modoDescripcion ? 14 : 16),
             decoration: BoxDecoration(
-              color: sel ? AppColors.verdeClaro : AppColors.blanco,
+              color: sel ? const Color(0xFF0F3020) : const Color(0xFF182318),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: sel ? AppColors.verde : AppColors.divider, width: sel ? 2 : 1),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
+              border: Border.all(
+                color: sel ? AppColors.verdeMedio : const Color(0xFF2A3D2A),
+                width: sel ? 2 : 1.5,
+              ),
             ),
             child: Row(children: [
-              Text(op.emoji, style: const TextStyle(fontSize: 26)),
+              Container(
+                width: 44, height: 44,
+                decoration: BoxDecoration(
+                  color: sel ? AppColors.verdeMedio.withOpacity(0.2) : const Color(0xFF0D1510),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(child: Text(op.emoji, style: const TextStyle(fontSize: 24))),
+              ),
               const SizedBox(width: 14),
               Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(op.valor,
                     style: TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w700,
-                      color: sel ? AppColors.verdeOs : AppColors.textPrimary,
+                      fontSize: 16, fontWeight: FontWeight.w700,
+                      color: sel ? AppColors.verdeMedio : Colors.white,
                     )),
                   if (op.descripcion != null && modoDescripcion)
                     Text(op.descripcion!,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF8FAF8F))),
                 ],
               )),
               if (sel)
-                const Icon(Icons.check_circle_rounded, color: AppColors.verde, size: 22),
+                const Icon(Icons.check_circle_rounded, color: AppColors.verdeMedio, size: 24),
             ]),
           ),
         );
@@ -646,30 +710,30 @@ class _NumeroBodyState extends State<_NumeroBody> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.blanco,
+        color: const Color(0xFF182318),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+        border: Border.all(color: const Color(0xFF2A3D2A)),
       ),
       child: Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text(
             widget.decimales ? _valor.toStringAsFixed(1) : _valor.round().toString(),
-            style: const TextStyle(fontSize: 56, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+            style: const TextStyle(fontSize: 56, fontWeight: FontWeight.w900, color: Colors.white),
           ),
           const SizedBox(width: 8),
           Padding(
             padding: const EdgeInsets.only(top: 20),
             child: Text(widget.sufijo,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: AppColors.textSecondary)),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Color(0xFF8FAF8F))),
           ),
         ]),
         const SizedBox(height: 20),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: AppColors.verde,
-            inactiveTrackColor: AppColors.fondoVerde,
-            thumbColor: AppColors.verde,
-            overlayColor: AppColors.verde.withValues(alpha: 0.15),
+            activeTrackColor: AppColors.verdeMedio,
+            inactiveTrackColor: const Color(0xFF2A3D2A),
+            thumbColor: AppColors.verdeMedio,
+            overlayColor: AppColors.verdeMedio.withOpacity(0.2),
             trackHeight: 6,
           ),
           child: Slider(
@@ -684,8 +748,8 @@ class _NumeroBodyState extends State<_NumeroBody> {
           ),
         ),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('${widget.min.round()} ${widget.sufijo}', style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
-          Text('${widget.max.round()} ${widget.sufijo}', style: const TextStyle(fontSize: 12, color: AppColors.textHint)),
+          Text('${widget.min.round()} ${widget.sufijo}', style: const TextStyle(fontSize: 12, color: Color(0xFF4A6B4A))),
+          Text('${widget.max.round()} ${widget.sufijo}', style: const TextStyle(fontSize: 12, color: Color(0xFF4A6B4A))),
         ]),
       ]),
     );
@@ -755,19 +819,20 @@ class _AyunoBody extends StatelessWidget {
       Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.fondoOro,
+          color: const Color(0xFF1E1A0A),
           borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFC9A227).withOpacity(0.3)),
         ),
         child: const Row(children: [
           Text('💡', style: TextStyle(fontSize: 20)),
           SizedBox(width: 10),
           Expanded(child: Text(
-            'Empieza por donde te sientas cómodo. Siempre puedes cambiar tu tipo de ayuno desde tu perfil.',
-            style: TextStyle(fontSize: 12, color: AppColors.textPrimary, height: 1.4),
+            'Empieza por donde te sientas cómodo. Puedes cambiarlo después desde tu perfil.',
+            style: TextStyle(fontSize: 13, color: Color(0xFFC9A227), height: 1.4),
           )),
         ]),
       ),
-      const SizedBox(height: 14),
+      const SizedBox(height: 12),
       ..._opciones.map((op) {
         final sel = seleccionado == op.id;
         return GestureDetector(
@@ -775,50 +840,51 @@ class _AyunoBody extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
             decoration: BoxDecoration(
-              color: sel ? AppColors.verdeClaro : AppColors.blanco,
+              color: sel ? const Color(0xFF0F3020) : const Color(0xFF182318),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: sel ? AppColors.verde : AppColors.divider,
-                width: sel ? 2 : 1,
+                color: sel ? AppColors.verdeMedio : const Color(0xFF2A3D2A),
+                width: sel ? 2 : 1.5,
               ),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6, offset: const Offset(0, 2)),
-              ],
             ),
             child: Row(children: [
-              Text(op.emoji, style: const TextStyle(fontSize: 24)),
+              Container(
+                width: 40, height: 40,
+                decoration: BoxDecoration(
+                  color: sel ? AppColors.verdeMedio.withOpacity(0.2) : const Color(0xFF0D1510),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(child: Text(op.emoji, style: const TextStyle(fontSize: 20))),
+              ),
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
                   Text(op.titulo,
                     style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w700,
-                      color: sel ? AppColors.verdeOs : AppColors.textPrimary,
+                      fontSize: 15, fontWeight: FontWeight.w700,
+                      color: sel ? AppColors.verdeMedio : Colors.white,
                     )),
                   if (op.nivel.isNotEmpty) ...[
                     const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: sel ? AppColors.verde.withValues(alpha: 0.15) : AppColors.fondoGris,
+                        color: AppColors.verdeMedio.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(op.nivel,
-                        style: TextStyle(
-                          fontSize: 10, fontWeight: FontWeight.w600,
-                          color: sel ? AppColors.verdeOs : AppColors.textSecondary,
-                        )),
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.verdeMedio)),
                     ),
                   ],
                 ]),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(op.desc,
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  style: const TextStyle(fontSize: 13, color: Color(0xFF8FAF8F))),
               ])),
               if (sel)
-                const Icon(Icons.check_circle_rounded, color: AppColors.verde, size: 20),
+                const Icon(Icons.check_circle_rounded, color: AppColors.verdeMedio, size: 22),
             ]),
           ),
         );
@@ -878,7 +944,7 @@ class _PlanBody extends StatelessWidget {
 
       // Features que tendrá
       ...<({String e, String t})>[
-        if (tipoAyuno != 'sin_ayuno') (e: '⏰', t: 'Timer de ayuno $tipoAyuno con notificaciones en hitos'),
+        if (tipoAyuno != 'sin_ayuno') (e: '⏰', t: 'Timer de ayuno $tipoAyuno con notificaciones'),
         (e: '📊', t: 'Seguimiento diario de macros y calorías'),
         (e: '🤖', t: 'GEM listo para responder tus dudas keto'),
         (e: '💧', t: 'Recordatorios de hidratación'),
@@ -886,17 +952,17 @@ class _PlanBody extends StatelessWidget {
         (e: '🏆', t: 'Logros y rachas motivacionales'),
       ].map((f) => Container(
         margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.blanco,
+          color: const Color(0xFF182318),
           borderRadius: BorderRadius.circular(14),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6)],
+          border: Border.all(color: const Color(0xFF2A3D2A)),
         ),
         child: Row(children: [
-          Text(f.e, style: const TextStyle(fontSize: 18)),
-          const SizedBox(width: 10),
-          Expanded(child: Text(f.t, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textPrimary))),
-          const Icon(Icons.check_rounded, color: AppColors.verde, size: 18),
+          Text(f.e, style: const TextStyle(fontSize: 20)),
+          const SizedBox(width: 12),
+          Expanded(child: Text(f.t, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white))),
+          const Icon(Icons.check_circle_rounded, color: AppColors.verdeMedio, size: 20),
         ]),
       )),
     ]);

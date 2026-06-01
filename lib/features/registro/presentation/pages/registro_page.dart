@@ -8,7 +8,7 @@ class RegistroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xFF0D1510),
       body: CustomScrollView(
         slivers: [
           // ── Header ─────────────────────────────────────────────
@@ -138,19 +138,18 @@ class _ResumenDia extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.blanco,
+        color: const Color(0xFF182318),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 14, offset: const Offset(0, 4))],
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Total consumido', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF0D3B1E))),
+              const Text('Total consumido', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: AppColors.fondoVerde, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(color: const Color(0xFF0F2B18), borderRadius: BorderRadius.circular(10)),
                 child: const Text('630 / 2100 kcal', style: TextStyle(fontSize: 15, color: AppColors.verde, fontWeight: FontWeight.w700)),
               ),
             ],
@@ -234,7 +233,7 @@ class _ComidaSection extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.blanco,
+        color: const Color(0xFF182318),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 3))],
       ),
@@ -248,7 +247,7 @@ class _ComidaSection extends StatelessWidget {
                 Text(emoji, style: const TextStyle(fontSize: 22)),
                 const SizedBox(width: 10),
                 Text(titulo,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0D3B1E))),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
                 const Spacer(),
                 Text('$_totalKcal / $kcalMeta kcal',
                   style: TextStyle(
@@ -298,7 +297,7 @@ class _ComidaSection extends StatelessWidget {
                   Container(
                     width: 32, height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.fondoVerde,
+                      color: const Color(0xFF0F2B18),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(Icons.add_rounded, color: AppColors.verde, size: 20),
@@ -341,7 +340,7 @@ class _AlimentoRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.nombre, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF0D3B1E))),
+                Text(item.nombre, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
                 Text(item.cantidad, style: const TextStyle(fontSize: 14, color: Color(0xFF1A5C2A))),
               ],
             ),
@@ -547,7 +546,7 @@ class _RegistroFoodPickerState extends State<_RegistroFoodPicker> {
                     _QBtn(Icons.remove, () { if (_cantidad > 25) setState(() => _cantidad -= 25); }),
                     const SizedBox(width: 14),
                     Text('${_cantidad.round()}g',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0D3B1E))),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
                     const SizedBox(width: 14),
                     _QBtn(Icons.add, () => setState(() => _cantidad += 25)),
                   ]),
@@ -593,7 +592,7 @@ class _QBtn extends StatelessWidget {
     child: Container(
       width: 34, height: 34,
       decoration: BoxDecoration(color: AppColors.fondoGris, borderRadius: BorderRadius.circular(10)),
-      child: Icon(icon, size: 16, color: Color(0xFF0D3B1E)),
+      child: Icon(icon, size: 16, color: Colors.white),
     ),
   );
 }
