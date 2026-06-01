@@ -34,8 +34,12 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Notificaciones locales
-  await NotificationService.instance.init();
-  await NotificationService.instance.programarMotivacionDiaria();
+  try {
+    await NotificationService.instance.init();
+    await NotificationService.instance.programarMotivacionDiaria();
+  } catch (_) {
+    // Notificaciones no críticas — la app continúa aunque fallen
+  }
 
   // Inyección de dependencias
   await di.initDependencies();

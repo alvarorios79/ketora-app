@@ -31,54 +31,50 @@ class _EjercicioPageState extends State<EjercicioPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xFF0D1510),
       body: NestedScrollView(
         headerSliverBuilder: (_, __) => [
           SliverAppBar(
-            expandedHeight: 150,
+            expandedHeight: 160,
             pinned: true,
-            backgroundColor: AppColors.verdeOs,
+            backgroundColor: Colors.black,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_rounded, color: AppColors.blanco),
               onPressed: () => context.go(AppRoutes.hoy),
             ),
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF064E3B), AppColors.verde],
-                    begin: Alignment.topLeft, end: Alignment.bottomRight,
-                  ),
-                ),
+                color: Colors.black,
                 child: SafeArea(
+                  top: false,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    padding: const EdgeInsets.fromLTRB(16, 14, 20, 0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Row(
-                          children: [
-                            const Text('KETORA',
-                              style: TextStyle(color: Colors.white54, fontSize: 12,
-                                fontWeight: FontWeight.w700, letterSpacing: 2)),
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(20),
+                        const SizedBox(width: 40), // espacio para el botón back
+                        Image.asset('assets/images/logo_icono.png', height: 90, fit: BoxFit.contain),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Ejercicio Keto',
+                                style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800)),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text('Rutinas keto 🔥',
+                                  style: TextStyle(color: AppColors.blanco, fontSize: 15, fontWeight: FontWeight.w600)),
                               ),
-                              child: const Text('Semana 2 💪',
-                                style: TextStyle(color: AppColors.blanco, fontSize: 12, fontWeight: FontWeight.w600)),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 10),
-                        const Text('Ejercicio Keto',
-                          style: TextStyle(color: AppColors.blanco, fontSize: 26, fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 4),
-                        const Text('Rutinas adaptadas a tu metabolismo keto 🔥',
-                          style: TextStyle(color: Colors.white70, fontSize: 13)),
                       ],
                     ),
                   ),
@@ -89,14 +85,14 @@ class _EjercicioPageState extends State<EjercicioPage>
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(48),
               child: Container(
-                color: const Color(0xFF064E3B),
+                color: AppColors.verdeOs,
                 child: TabBar(
                   controller: _tabCtrl,
                   indicatorColor: AppColors.oro,
                   indicatorWeight: 3,
                   labelColor: AppColors.blanco,
                   unselectedLabelColor: Colors.white54,
-                  labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                  labelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                   tabs: const [
                     Tab(text: 'Rutinas'),
                     Tab(text: 'Keto Tips'),
@@ -154,7 +150,7 @@ class _RutinasTab extends StatelessWidget {
         duracion: '30 min',
         nivel: 'Principiante',
         emoji: '🚶',
-        color: AppColors.fondoVerde,
+        color: const Color(0xFF0F2B18),
         descripcion: 'Caminata a paso moderado. El ejercicio más keto-friendly. Máxima quema de grasa.',
         ejercicios: [
           _Ejercicio('Calentamiento', '5 min', 'Camina despacio', '🦶'),
@@ -216,7 +212,7 @@ class _RutinasTab extends StatelessWidget {
         duracion: '45 min',
         nivel: 'Intermedio',
         emoji: '🏟️',
-        color: AppColors.fondoVerde,
+        color: const Color(0xFF0F2B18),
         descripcion: 'Sesión completa de gimnasio optimizada para keto. Combina fuerza y cardio.',
         ejercicios: [
           _Ejercicio('Sentadilla con barra', '4×8', '90 seg desc', '🏋️'),
@@ -233,7 +229,7 @@ class _RutinasTab extends StatelessWidget {
         duracion: '30 min',
         nivel: 'Principiante',
         emoji: '🚶',
-        color: AppColors.fondoVerde,
+        color: const Color(0xFF0F2B18),
         descripcion: 'Caminata en caminadora a baja intensidad. Zona de quema de grasa ideal para keto.',
         ejercicios: [
           _Ejercicio('Calentamiento', '5 min', '3.5 km/h plano', '🦶'),
@@ -293,7 +289,7 @@ class _RutinasTab extends StatelessWidget {
         duracion: '35 min',
         nivel: 'Principiante',
         emoji: '🔄',
-        color: AppColors.fondoVerde,
+        color: const Color(0xFF0F2B18),
         descripcion: 'Sin impacto en articulaciones. Perfecto para empezar keto sin lesionarse.',
         ejercicios: [
           _Ejercicio('Calentamiento', '5 min', 'Resistencia 1-2', '🦶'),
@@ -339,7 +335,7 @@ class _RutinasTab extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('¿Qué equipo tienes?',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
@@ -357,7 +353,7 @@ class _RutinasTab extends StatelessWidget {
                       ),
                       child: Text(eq,
                         style: TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w600,
+                          fontSize: 16, fontWeight: FontWeight.w600,
                           color: sel ? AppColors.blanco : AppColors.textSecondary,
                         ),
                       ),
@@ -383,7 +379,7 @@ class _RutinasTab extends StatelessWidget {
             SizedBox(width: 10),
             Expanded(child: Text(
               'En keto tu cuerpo usa grasa como combustible. Ejercicio de baja-media intensidad = máxima quema de grasa.',
-              style: TextStyle(fontSize: 12, color: Color(0xFF78350F), height: 1.5),
+              style: TextStyle(fontSize: 16, color: Color(0xFF78350F), height: 1.5),
             )),
           ]),
         ),
@@ -436,7 +432,7 @@ class _RutinaCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: AppColors.blanco,
+          color: const Color(0xFF182318),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 4))],
         ),
@@ -457,7 +453,7 @@ class _RutinaCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(rutina.nombre,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
                     const SizedBox(height: 4),
                     Row(children: [
                       _Chip(rutina.duracion, AppColors.verdeOs),
@@ -472,7 +468,7 @@ class _RutinaCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
               child: Text(rutina.descripcion,
-                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.5)),
+                style: const TextStyle(fontSize: 15, color: Color(0xFF8FAF8F), height: 1.5)),
             ),
           ],
         ),
@@ -494,7 +490,7 @@ class _Chip extends StatelessWidget {
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color)),
+      child: Text(label, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: color)),
     );
   }
 }
@@ -524,7 +520,7 @@ class _RutinaDetalle extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(rutina.nombre,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
                 Row(children: [
                   _Chip(rutina.duracion, AppColors.verde),
                   const SizedBox(width: 6),
@@ -532,7 +528,7 @@ class _RutinaDetalle extends StatelessWidget {
                 ]),
               ])),
               IconButton(
-                icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
+                icon: const Icon(Icons.close_rounded, color: Color(0xFF8FAF8F)),
                 onPressed: () => Navigator.pop(context),
               ),
             ]),
@@ -543,9 +539,9 @@ class _RutinaDetalle extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             children: [
               Text(rutina.descripcion,
-                style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.6)),
+                style: const TextStyle(fontSize: 16, color: Color(0xFF8FAF8F), height: 1.6)),
               const SizedBox(height: 16),
-              const Text('Ejercicios', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              const Text('Ejercicios', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
               const SizedBox(height: 10),
               ...rutina.ejercicios.asMap().entries.map((e) => _EjercicioRow(
                 num: e.key + 1,
@@ -584,28 +580,28 @@ class _EjercicioRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.blanco,
+        color: const Color(0xFF182318),
         borderRadius: BorderRadius.circular(14),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6)],
       ),
       child: Row(children: [
         Container(
           width: 36, height: 36,
-          decoration: const BoxDecoration(color: AppColors.fondoVerde, shape: BoxShape.circle),
+          decoration: const BoxDecoration(color: const Color(0xFF0F2B18), shape: BoxShape.circle),
           child: Center(child: Text('$num',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.verde))),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.verde))),
         ),
         const SizedBox(width: 12),
         Text(ejercicio.emoji, style: const TextStyle(fontSize: 22)),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(ejercicio.nombre,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
           if (ejercicio.desc.isNotEmpty)
-            Text(ejercicio.desc, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+            Text(ejercicio.desc, style: const TextStyle(fontSize: 16, color: Color(0xFF8FAF8F))),
         ])),
         Text(ejercicio.series,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.verde)),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.verde)),
       ]),
     );
   }
@@ -674,7 +670,7 @@ class _TipCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.blanco,
+        color: const Color(0xFF182318),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
       ),
@@ -687,10 +683,10 @@ class _TipCard extends StatelessWidget {
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(tip.titulo,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
           const SizedBox(height: 4),
           Text(tip.contenido,
-            style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.5)),
+            style: const TextStyle(fontSize: 15, color: Color(0xFF8FAF8F), height: 1.5)),
         ])),
       ]),
     );
@@ -719,7 +715,7 @@ class _HoyTab extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Rutina de hoy', style: TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 1)),
+            const Text('Rutina de hoy', style: TextStyle(color: Colors.white70, fontSize: 16, letterSpacing: 1)),
             const SizedBox(height: 6),
             const Text('HIIT Keto Mañana', style: TextStyle(color: AppColors.blanco, fontSize: 22, fontWeight: FontWeight.w800)),
             const SizedBox(height: 4),
@@ -746,7 +742,7 @@ class _HoyTab extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Stats semanales
-        const Text('Esta semana', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+        const Text('Esta semana', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
         const SizedBox(height: 12),
         Row(children: [
           Expanded(child: _StatBox('2', 'Sesiones', Icons.fitness_center_rounded, AppColors.verde)),
@@ -758,7 +754,7 @@ class _HoyTab extends StatelessWidget {
         const SizedBox(height: 20),
 
         // Días de la semana
-        const Text('Registro semanal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+        const Text('Registro semanal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -776,7 +772,7 @@ class _HoyTab extends StatelessWidget {
                 child: Center(child: completado
                   ? const Icon(Icons.check_rounded, color: AppColors.blanco, size: 18)
                   : Text(e.value, style: TextStyle(
-                      fontWeight: FontWeight.w700, fontSize: 14,
+                      fontWeight: FontWeight.w700, fontSize: 16,
                       color: hoy ? AppColors.verde : AppColors.textHint))),
               ),
             ]);
@@ -788,7 +784,7 @@ class _HoyTab extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.fondoVerde,
+            color: const Color(0xFF0F2B18),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.verde.withValues(alpha: 0.2)),
           ),
@@ -796,10 +792,10 @@ class _HoyTab extends StatelessWidget {
             Text('🥑', style: TextStyle(fontSize: 24)),
             SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Consejo de GEM', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.verdeOs)),
+              Text('Consejo de GEM', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.verdeOs)),
               SizedBox(height: 4),
               Text('Hoy es día de HIIT. Recuerda tomar electrolitos 30 min antes para maximizar tu rendimiento en cetosis.',
-                style: TextStyle(fontSize: 12, color: AppColors.verdeOs, height: 1.5)),
+                style: TextStyle(fontSize: 16, color: AppColors.verdeOs, height: 1.5)),
             ])),
           ]),
         ),
@@ -821,7 +817,7 @@ class _StatBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.blanco,
+        color: const Color(0xFF182318),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
       ),
@@ -829,7 +825,7 @@ class _StatBox extends StatelessWidget {
         Icon(icon, color: color, size: 24),
         const SizedBox(height: 6),
         Text(valor, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: color)),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+        Text(label, style: const TextStyle(fontSize: 16, color: Color(0xFF8FAF8F))),
       ]),
     );
   }
