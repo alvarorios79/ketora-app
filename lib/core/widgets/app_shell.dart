@@ -384,31 +384,33 @@ class _IconFoodPickerState extends State<_IconFoodPicker> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.88,
       decoration: const BoxDecoration(
-        color: AppColors.surface,
+        color: Color(0xFF0D1510),
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
         children: [
           // Handle + título
           Container(
-            color: AppColors.blanco,
+            color: Colors.black,
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
             child: Column(
               children: [
                 Center(
                   child: Container(
                     width: 40, height: 4,
-                    decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
+                    decoration: BoxDecoration(color: const Color(0xFF2A3D2A), borderRadius: BorderRadius.circular(2)),
                   ),
                 ),
                 const SizedBox(height: 14),
                 Row(
                   children: [
+                    Image.asset('assets/images/logo_icono.png', height: 36),
+                    const SizedBox(width: 10),
                     const Text('Elige tu alimento',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
+                      icon: const Icon(Icons.close_rounded, color: Color(0xFF8FAF8F)),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -432,14 +434,14 @@ class _IconFoodPickerState extends State<_IconFoodPicker> {
                           margin: const EdgeInsets.only(right: 8),
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: activo ? AppColors.verde : AppColors.fondoGris,
+                            color: activo ? AppColors.verde : const Color(0xFF182318),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(_cats[i].label,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: activo ? AppColors.blanco : AppColors.textSecondary,
+                              color: activo ? Colors.white : const Color(0xFF8FAF8F),
                             ),
                           ),
                         ),
@@ -460,7 +462,7 @@ class _IconFoodPickerState extends State<_IconFoodPicker> {
                 crossAxisCount: 4,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 0.8,
+                childAspectRatio: 0.85,
               ),
               itemCount: cat.items.length,
               itemBuilder: (_, i) {
@@ -468,41 +470,40 @@ class _IconFoodPickerState extends State<_IconFoodPicker> {
                 final seleccionado = _seleccionado == item;
                 return GestureDetector(
                   onTap: () => setState(() => _seleccionado = seleccionado ? null : item),
-                  child: AnimatedContainer(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
-                      color: seleccionado ? AppColors.verdeClaro : AppColors.blanco,
+                      color: seleccionado ? const Color(0xFF0F3020) : const Color(0xFF182318),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: seleccionado ? AppColors.verde : Colors.transparent,
-                        width: 2,
+                        color: seleccionado ? AppColors.verde : const Color(0xFF2A3D2A),
+                        width: 1.5,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(item.emoji, style: const TextStyle(fontSize: 32)),
-                        const SizedBox(height: 6),
+                        Text(item.emoji, style: const TextStyle(fontSize: 28)),
+                        const SizedBox(height: 4),
                         Text(item.nombre,
                           textAlign: TextAlign.center,
                           maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: seleccionado ? FontWeight.w700 : FontWeight.w500,
-                            color: seleccionado ? AppColors.verdeOs : AppColors.textPrimary,
+                            color: seleccionado ? AppColors.verdeMedio : const Color(0xFF8FAF8F),
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text('${item.kcal} kcal',
-                          style: const TextStyle(fontSize: 9, color: AppColors.textSecondary)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 9, color: Color(0xFF4A6B4A))),
                       ],
+                    ),
                     ),
                   ),
                 );
@@ -517,7 +518,7 @@ class _IconFoodPickerState extends State<_IconFoodPicker> {
             child: _seleccionado != null
               ? Container(
                   decoration: const BoxDecoration(
-                    color: AppColors.blanco,
+                    color: Color(0xFF182318),
                     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                     boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
                   ),

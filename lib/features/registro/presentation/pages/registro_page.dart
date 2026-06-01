@@ -418,33 +418,35 @@ class _RegistroFoodPickerState extends State<_RegistroFoodPicker> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
-        color: AppColors.surface,
+        color: Color(0xFF0D1510),
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
         children: [
           Container(
-            color: AppColors.blanco,
+            color: Colors.black,
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
             child: Column(
               children: [
                 Center(child: Container(width: 40, height: 4,
-                  decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)))),
-                const SizedBox(height: 14),
+                  decoration: BoxDecoration(color: const Color(0xFF2A3D2A), borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 12),
                 Row(children: [
+                  Image.asset('assets/images/logo_icono.png', height: 36),
+                  const SizedBox(width: 10),
                   Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('Agregar a ${widget.comida}',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0D3B1E))),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
                     const Text('Toca un alimento para seleccionar',
-                      style: TextStyle(fontSize: 15, color: Color(0xFF1A5C2A))),
+                      style: TextStyle(fontSize: 13, color: Color(0xFF8FAF8F))),
                   ]),
                   const Spacer(),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, color: Color(0xFF1A5C2A)),
+                    icon: const Icon(Icons.close_rounded, color: Color(0xFF8FAF8F)),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ]),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 SizedBox(
                   height: 36,
                   child: ListView.builder(
@@ -459,18 +461,18 @@ class _RegistroFoodPickerState extends State<_RegistroFoodPicker> {
                           margin: const EdgeInsets.only(right: 8),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                           decoration: BoxDecoration(
-                            color: activo ? AppColors.verde : AppColors.fondoGris,
+                            color: activo ? AppColors.verde : const Color(0xFF182318),
                             borderRadius: BorderRadius.circular(18),
                           ),
                           child: Text(_cats[i].label,
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
-                              color: activo ? AppColors.blanco : AppColors.textSecondary)),
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600,
+                              color: activo ? Colors.white : const Color(0xFF8FAF8F))),
                         ),
                       );
                     },
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -478,7 +480,7 @@ class _RegistroFoodPickerState extends State<_RegistroFoodPicker> {
             child: GridView.builder(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.82,
+                crossAxisCount: 4, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 0.85,
               ),
               itemCount: cat.items.length,
               itemBuilder: (_, i) {
@@ -486,24 +488,29 @@ class _RegistroFoodPickerState extends State<_RegistroFoodPicker> {
                 final sel = _sel == f;
                 return GestureDetector(
                   onTap: () => setState(() => _sel = sel ? null : f),
-                  child: AnimatedContainer(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
                     decoration: BoxDecoration(
-                      color: sel ? AppColors.verdeClaro : AppColors.blanco,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: sel ? AppColors.verde : Colors.transparent, width: 2),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6, offset: const Offset(0, 2))],
+                      color: sel ? const Color(0xFF0F3020) : const Color(0xFF182318),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: sel ? AppColors.verde : const Color(0xFF2A3D2A), width: 1.5),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(f.emoji, style: const TextStyle(fontSize: 30)),
-                        const SizedBox(height: 4),
+                        Text(f.emoji, style: const TextStyle(fontSize: 26)),
+                        const SizedBox(height: 3),
                         Text(f.nombre, textAlign: TextAlign.center, maxLines: 2,
-                          style: TextStyle(fontSize: 15, fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
-                            color: sel ? AppColors.verdeOs : AppColors.textPrimary)),
-                        Text('${f.kcal} kcal', style: const TextStyle(fontSize: 15, color: Color(0xFF1A5C2A))),
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 10, fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                            color: sel ? AppColors.verdeMedio : const Color(0xFF8FAF8F))),
+                        Text('${f.kcal} kcal',
+                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 9, color: Color(0xFF4A6B4A))),
                       ],
+                    ),
                     ),
                   ),
                 );
@@ -513,9 +520,9 @@ class _RegistroFoodPickerState extends State<_RegistroFoodPicker> {
           if (_sel != null)
             Container(
               decoration: const BoxDecoration(
-                color: AppColors.blanco,
+                color: Color(0xFF182318),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10)],
               ),
               padding: EdgeInsets.only(
                 left: 20, right: 20, top: 18,
@@ -528,9 +535,9 @@ class _RegistroFoodPickerState extends State<_RegistroFoodPicker> {
                     Text(_sel!.emoji, style: const TextStyle(fontSize: 34)),
                     const SizedBox(width: 12),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(_sel!.nombre, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0D3B1E))),
+                      Text(_sel!.nombre, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
                       Text('${(_sel!.kcal * _cantidad / 100).round()} kcal · ${(_sel!.grasas * _cantidad / 100).round()}g G · ${(_sel!.proteina * _cantidad / 100).round()}g P · ${(_sel!.carbos * _cantidad / 100).round()}g C',
-                        style: const TextStyle(fontSize: 14, color: Color(0xFF1A5C2A))),
+                        style: const TextStyle(fontSize: 13, color: Color(0xFF8FAF8F))),
                     ])),
                   ]),
                   const SizedBox(height: 14),
