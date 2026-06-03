@@ -23,9 +23,18 @@ android {
         multiDexEnabled = true
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../../android/ketora-release.jks")
+            storePassword = "310712"
+            keyAlias = "ketora"
+            keyPassword = "310712"
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
         }

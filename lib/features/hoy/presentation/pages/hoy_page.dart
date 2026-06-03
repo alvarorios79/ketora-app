@@ -47,6 +47,168 @@ class _Dashboard extends StatelessWidget {
   final HoyCargado datos;
   const _Dashboard({required this.datos});
 
+  String _emojiAlimento(String nombre) {
+    final n = nombre.toLowerCase();
+    if (n.contains('aguacate') || n.contains('avocado')) return '🥑';
+    if (n.contains('ensalada') || n.contains('salad')) return '🥗';
+    if (n.contains('res') || n.contains('carne') || n.contains('bistec') || n.contains('lomo') || n.contains('beef') || n.contains('filete')) return '🥩';
+    if (n.contains('pollo') || n.contains('chicken')) return '🍗';
+    if (n.contains('cerdo') || n.contains('pork') || n.contains('chicharron') || n.contains('tocineta')) return '🥓';
+    if (n.contains('salmon') || n.contains('salmón') || n.contains('atun') || n.contains('atún') || n.contains('pescado') || n.contains('fish') || n.contains('mojarra')) return '🐟';
+    if (n.contains('huevo') || n.contains('egg')) return '🍳';
+    if (n.contains('tomate') || n.contains('tomato')) return '🍅';
+    if (n.contains('brocoli') || n.contains('brócoli') || n.contains('verdura') || n.contains('espinaca') || n.contains('lechuga')) return '🥦';
+    if (n.contains('papa') || n.contains('patata') || n.contains('potato')) return '🥔';
+    if (n.contains('arroz') || n.contains('rice')) return '🍚';
+    if (n.contains('arepa')) return '🫓';
+    if (n.contains('aguapanela') || n.contains('panela') || n.contains('jugo') || n.contains('agua') || n.contains('te ') || n.contains('café') || n.contains('cafe')) return '☕';
+    if (n.contains('leche') || n.contains('milk') || n.contains('yogur')) return '🥛';
+    if (n.contains('queso') || n.contains('cheese')) return '🧀';
+    if (n.contains('nuez') || n.contains('almendra') || n.contains('nueces') || n.contains('mani')) return '🥜';
+    if (n.contains('mantequilla') || n.contains('butter')) return '🧈';
+    if (n.contains('aceite') || n.contains('oil') || n.contains('aceituna')) return '🫒';
+    if (n.contains('chocolate') || n.contains('cacao')) return '🍫';
+    if (n.contains('fresa') || n.contains('mora') || n.contains('blueberry') || n.contains('fruta') || n.contains('mango') || n.contains('pina') || n.contains('piña')) return '🍓';
+    if (n.contains('limon') || n.contains('limón') || n.contains('naranja') || n.contains('citrico')) return '🍋';
+    if (n.contains('sancocho') || n.contains('sopa') || n.contains('caldo') || n.contains('ajiaco') || n.contains('mondongo')) return '🍲';
+    if (n.contains('bandeja') || n.contains('frijol')) return '🫘';
+    if (n.contains('empanada') || n.contains('tamal')) return '🥟';
+    if (n.contains('pan') || n.contains('bread') || n.contains('wrap')) return '🍞';
+    if (n.contains('pizza')) return '🍕';
+    if (n.contains('pasta') || n.contains('espagueti')) return '🍝';
+    if (n.contains('hamburguesa') || n.contains('burger')) return '🍔';
+    if (n.contains('perro') || n.contains('hot dog')) return '🌭';
+    if (n.contains('chorizo') || n.contains('salchicha')) return '🌭';
+    if (n.contains('miel') || n.contains('honey')) return '🍯';
+    if (n.contains('maiz') || n.contains('mazorca') || n.contains('corn')) return '🌽';
+    return '🍽️';
+  }
+
+  Future<void> _mostrarConfigVentana(BuildContext context) async {
+    final perfil = sl<PerfilService>().perfilActual;
+
+    int horaInicio = perfil?.horaInicioComida ?? 12;
+    int minInicio  = perfil?.minInicioComida  ?? 0;
+    int horaFin    = perfil?.horaFinComida    ?? 20;
+    int minFin     = perfil?.minFinComida     ?? 0;
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => Container(
+          padding: EdgeInsets.fromLTRB(24, 20, 24, MediaQuery.of(ctx).viewInsets.bottom + 24),
+          decoration: const BoxDecoration(
+            color: Color(0xFF182318),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('⏱️ Mi ventana de alimentación', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
+              const SizedBox(height: 6),
+              const Text('KETORA usará este horario para tu contador de ayuno', style: TextStyle(fontSize: 13, color: Color(0xFF8FAF8F))),
+              const SizedBox(height: 20),
+
+              // Hora de inicio (rompo el ayuno)
+              _SelectorHora(
+                label: '🍽️ Rompo el ayuno a las',
+                hora: horaInicio, min: minInicio,
+                onChanged: (h, m) => setS(() { horaInicio = h; minInicio = m; }),
+              ),
+              const SizedBox(height: 16),
+
+              // Hora de fin (última comida)
+              _SelectorHora(
+                label: '🌙 Última comida a las',
+                hora: horaFin, min: minFin,
+                onChanged: (h, m) => setS(() { horaFin = h; minFin = m; }),
+              ),
+              const SizedBox(height: 12),
+
+              // Resumen
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(color: const Color(0xFF0D1510), borderRadius: BorderRadius.circular(12)),
+                child: Builder(builder: (_) {
+                  final ini = '${horaInicio.toString().padLeft(2,'0')}:${minInicio.toString().padLeft(2,'0')}';
+                  final fin = '${horaFin.toString().padLeft(2,'0')}:${minFin.toString().padLeft(2,'0')}';
+                  final mins = (horaFin * 60 + minFin) <= (horaInicio * 60 + minInicio)
+                      ? (horaFin * 60 + minFin + 1440) - (horaInicio * 60 + minInicio)
+                      : (horaFin * 60 + minFin) - (horaInicio * 60 + minInicio);
+                  final horasComida = (mins / 60).toStringAsFixed(1);
+                  final horasAyuno  = (24 - mins / 60).toStringAsFixed(1);
+                  return Text(
+                    'Ventana de comidas: $ini → $fin ($horasComida h)\nAyuno: $horasAyuno horas',
+                    style: const TextStyle(fontSize: 13, color: Color(0xFF8FAF8F), height: 1.5),
+                  );
+                }),
+              ),
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final uid = sl<PerfilService>().perfilActual?.uid ?? '';
+                    final base = sl<PerfilService>().perfilActual;
+                    if (base == null || uid.isEmpty) { Navigator.pop(ctx); return; }
+                    final updated = base.copyWith(
+                      horaInicioComida: horaInicio,
+                      minInicioComida:  minInicio,
+                      horaFinComida:    horaFin,
+                      minFinComida:     minFin,
+                    );
+                    await sl<PerfilService>().guardarPerfil(updated);
+                    if (ctx.mounted) {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('✓ Ventana de alimentación actualizada'),
+                        backgroundColor: AppColors.verde,
+                        behavior: SnackBarBehavior.floating,
+                      ));
+                    }
+                  },
+                  child: const Text('Guardar mi ventana'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _confirmarLimpiarDia(BuildContext context, HoyBloc bloc) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF182318),
+        title: const Text('¿Limpiar registro de hoy?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17)),
+        content: const Text('Se eliminarán todos los alimentos registrados hoy. Esta acción no se puede deshacer.',
+          style: TextStyle(color: Color(0xFF8FAF8F))),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar', style: TextStyle(color: Color(0xFF8FAF8F)))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444), foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            onPressed: () {
+              Navigator.pop(ctx);
+              // Eliminar uno por uno
+              for (final a in datos.registro.alimentos) {
+                bloc.add(HoyEliminarAlimento(a.id));
+              }
+            },
+            child: const Text('Limpiar todo'),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _saludo() {
     final h = DateTime.now().hour;
     if (h < 12) return '¡Buenos días';
@@ -158,33 +320,46 @@ class _Dashboard extends StatelessWidget {
                           color: AppColors.fondoVerde,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text('${(calMeta - calConsumidas).round()} kcal restantes',
-                          style: const TextStyle(fontSize: 14, color: AppColors.verde, fontWeight: FontWeight.w600)),
+                        child: Builder(builder: (context) {
+                          final restantes = (calMeta - calConsumidas).round();
+                          final excedido = restantes < 0;
+                          return Text(
+                            excedido ? '${restantes.abs()} kcal excedidas' : '$restantes kcal disponibles',
+                            style: TextStyle(fontSize: 13, color: excedido ? const Color(0xFFEF4444) : AppColors.verde, fontWeight: FontWeight.w700),
+                          );
+                        }),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      // Anillo de calorías
-                      CircularPercentIndicator(
-                        radius: 60,
-                        lineWidth: 10,
-                        percent: pctCal,
-                        animation: true,
-                        animationDuration: 800,
-                        circularStrokeCap: CircularStrokeCap.round,
-                        backgroundColor: const Color(0xFFE5E5E5),
-                        progressColor: Colors.white,
-                        center: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('${calConsumidas.round()}',
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white)),
-                            const Text('kcal', style: TextStyle(fontSize: 13, color: Color(0xFF8FAF8F))),
-                          ],
-                        ),
-                      ),
+                      // Anillo de calorías — muestra las que quedan
+                      Builder(builder: (context) {
+                        final restantes = calMeta - calConsumidas;
+                        final excedido = restantes < 0;
+                        final pctRestante = excedido ? 1.0 : (restantes / calMeta).clamp(0.0, 1.0);
+                        final colorAnillo = excedido ? const Color(0xFFEF4444) : Colors.white;
+                        return CircularPercentIndicator(
+                          radius: 60,
+                          lineWidth: 10,
+                          percent: pctRestante,
+                          animation: true,
+                          animationDuration: 800,
+                          circularStrokeCap: CircularStrokeCap.round,
+                          backgroundColor: const Color(0xFF3A5A3A),
+                          progressColor: colorAnillo,
+                          center: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(excedido ? '+${restantes.abs().round()}' : '${restantes.round()}',
+                                style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: colorAnillo)),
+                              Text(excedido ? 'excedido' : 'kcal left',
+                                style: const TextStyle(fontSize: 11, color: Color(0xFF8FAF8F))),
+                            ],
+                          ),
+                        );
+                      }),
                       const SizedBox(width: 20),
                       // Barras de macros
                       Expanded(
@@ -228,71 +403,63 @@ class _Dashboard extends StatelessWidget {
             child: Builder(
               builder: (ctx) {
                 final bloc = ctx.read<HoyBloc>();
+                final perfil = sl<PerfilService>().perfilActual;
                 return _AyunoCard(
                   activo: reg.ayunoActivo,
                   duracion: reg.duracionAyuno,
                   onTap: () => bloc.add(reg.ayunoActivo ? HoyRomperAyuno() : HoyIniciarAyuno()),
+                  horaInicioComida: perfil?.horaInicioComida ?? 12,
+                  minInicioComida:  perfil?.minInicioComida  ?? 0,
+                  horaFinComida:    perfil?.horaFinComida    ?? 20,
+                  minFinComida:     perfil?.minFinComida     ?? 0,
+                  onEditarVentana: () => _mostrarConfigVentana(ctx),
                 );
               },
             ),
           ),
 
-          // ── Agua ────────────────────────────────────────────
+          // ── Hidratación ─────────────────────────────────────
           SliverToBoxAdapter(
             child: Builder(
               builder: (ctx) {
                 final bloc = ctx.read<HoyBloc>();
                 return _Card(
                   margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircularPercentIndicator(
-                        radius: 30,
-                        lineWidth: 6,
-                        percent: pctAgua,
-                        animation: true,
-                        circularStrokeCap: CircularStrokeCap.round,
-                        backgroundColor: const Color(0xFF3A5A7A),
-                        progressColor: const Color(0xFF60C8F5),
-                        center: const Icon(Icons.water_drop, color: Color(0xFF60C8F5), size: 16),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
+                      Row(children: [
+                        CircularPercentIndicator(
+                          radius: 28,
+                          lineWidth: 6,
+                          percent: pctAgua,
+                          animation: true,
+                          circularStrokeCap: CircularStrokeCap.round,
+                          backgroundColor: const Color(0xFF3A5A7A),
+                          progressColor: const Color(0xFF60C8F5),
+                          center: const Icon(Icons.water_drop, color: Color(0xFF60C8F5), size: 14),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Agua', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+                            const Text('Hidratación del día', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
                             Text('$aguaMl ml de $aguaMeta ml',
-                              style: const TextStyle(fontSize: 14, color: Color(0xFF8FAF8F))),
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF8FAF8F))),
                           ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(5, (i) {
-                          final lleno = (aguaMl / 500) > i;
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 3),
-                            child: Icon(
-                              lleno ? Icons.water_drop : Icons.water_drop_outlined,
-                              color: lleno ? AppColors.info : AppColors.textHint,
-                              size: 13,
-                            ),
-                          );
-                        }),
-                      ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () => bloc.add(const HoyAgregarAgua()),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppColors.fondoAzul,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text('+250ml', style: TextStyle(fontSize: 14, color: AppColors.info, fontWeight: FontWeight.w600)),
-                        ),
-                      ),
+                        )),
+                      ]),
+                      const SizedBox(height: 12),
+                      // Botones de bebidas
+                      Row(children: [
+                        _BebidaBtn('💧', 'Agua', 250, () => bloc.add(const HoyAgregarAgua(mililitros: 250))),
+                        const SizedBox(width: 8),
+                        _BebidaBtn('☕', 'Café', 240, () => bloc.add(const HoyAgregarAgua(mililitros: 240))),
+                        const SizedBox(width: 8),
+                        _BebidaBtn('🍵', 'Té', 240, () => bloc.add(const HoyAgregarAgua(mililitros: 240))),
+                        const SizedBox(width: 8),
+                        _BebidaBtn('🥥', 'L.Coco', 200, () => bloc.add(const HoyAgregarAgua(mililitros: 200))),
+                      ]),
                     ],
                   ),
                 );
@@ -309,20 +476,47 @@ class _Dashboard extends StatelessWidget {
                   const Text('Registrado hoy',
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
                   const Spacer(),
-                  Text('${reg.alimentos.isEmpty ? 3 : reg.alimentos.length} comidas',
-                    style: const TextStyle(fontSize: 14, color: Color(0xFF8FAF8F))),
+                  if (reg.alimentos.isNotEmpty) ...[
+                    Text('${reg.alimentos.length} items',
+                      style: const TextStyle(fontSize: 13, color: Color(0xFF8FAF8F))),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () => _confirmarLimpiarDia(context, context.read<HoyBloc>()),
+                      child: const Text('Limpiar todo',
+                        style: TextStyle(fontSize: 13, color: Color(0xFFEF4444), fontWeight: FontWeight.w600)),
+                    ),
+                  ] else
+                    const Text('Desliza ← para eliminar',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF4A6B4A))),
                 ],
               ),
             ),
           ),
 
           if (reg.alimentos.isEmpty)
-            const SliverList(
-              delegate: SliverChildListDelegate.fixed([
-                _ComidaPlaceholder(emoji: '🍳', titulo: 'Desayuno', desc: 'Huevos revueltos con aguacate', kcal: '420 kcal', hora: '8:00'),
-                _ComidaPlaceholder(emoji: '🥗', titulo: 'Almuerzo', desc: 'Ensalada César con pollo', kcal: '580 kcal', hora: '13:30'),
-                _ComidaPlaceholder(emoji: '🐟', titulo: 'Cena', desc: 'Salmón con brócoli al vapor', kcal: '620 kcal', hora: '20:00'),
-              ]),
+            SliverToBoxAdapter(
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF182318),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF2A3D2A)),
+                ),
+                child: const Column(
+                  children: [
+                    Text('🍽️', style: TextStyle(fontSize: 40)),
+                    SizedBox(height: 12),
+                    Text('Aún no has registrado nada hoy',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
+                    SizedBox(height: 6),
+                    Text('Toca el botón + para agregar tu primera comida del día',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 13, color: Color(0xFF8FAF8F), height: 1.4)),
+                  ],
+                ),
+              ),
             )
           else
             SliverList(
@@ -330,12 +524,7 @@ class _Dashboard extends StatelessWidget {
                 (ctx, i) {
                   final a = reg.alimentos[i];
                   // Emoji según el tipo de comida
-                  final emoji = switch (a.comida) {
-                    'desayuno' => '🍳',
-                    'almuerzo' => '🥗',
-                    'cena'     => '🐟',
-                    _          => '🍽️',
-                  };
+                  final emoji = _emojiAlimento(a.nombre);
                   return Dismissible(
                     key: ValueKey(a.id),
                     direction: DismissDirection.endToStart,
@@ -510,6 +699,83 @@ class _HeaderIcon extends StatelessWidget {
   }
 }
 
+class _SelectorHora extends StatelessWidget {
+  final String label;
+  final int hora, min;
+  final void Function(int h, int m) onChanged;
+  const _SelectorHora({required this.label, required this.hora, required this.min, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+      const SizedBox(height: 8),
+      Row(children: [
+        // Hora
+        Expanded(child: GestureDetector(
+          onTap: () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay(hour: hora, minute: min),
+              builder: (ctx, child) => Theme(
+                data: ThemeData.dark().copyWith(
+                  colorScheme: const ColorScheme.dark(primary: Color(0xFF7CB518)),
+                ),
+                child: child!,
+              ),
+            );
+            if (picked != null) onChanged(picked.hour, picked.minute);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0D1510),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF7CB518).withOpacity(0.4)),
+            ),
+            child: Text(
+              '${hora.toString().padLeft(2,'0')}:${min.toString().padLeft(2,'0')}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF7CB518)),
+            ),
+          ),
+        )),
+        const SizedBox(width: 12),
+        const Text('Toca para cambiar', style: TextStyle(fontSize: 12, color: Color(0xFF8FAF8F))),
+      ]),
+    ],
+  );
+}
+
+class _BebidaBtn extends StatelessWidget {
+  final String emoji, label;
+  final int ml;
+  final VoidCallback onTap;
+  const _BebidaBtn(this.emoji, this.label, this.ml, this.onTap);
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+    child: GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0D1510),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF60C8F5).withOpacity(0.3)),
+        ),
+        child: Column(children: [
+          Text(emoji, style: const TextStyle(fontSize: 20)),
+          const SizedBox(height: 2),
+          Text(label, style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
+          Text('${ml}ml', style: const TextStyle(fontSize: 10, color: Color(0xFF60C8F5))),
+        ]),
+      ),
+    ),
+  );
+}
+
 class _Card extends StatelessWidget {
   final Widget child;
   final EdgeInsets margin;
@@ -554,10 +820,12 @@ class _MacroBar extends StatelessWidget {
           children: [
             Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
             const SizedBox(width: 6),
-            Text(label, style: const TextStyle(fontSize: 14, color: Color(0xFF8FAF8F), fontWeight: FontWeight.w500)),
-            const Spacer(),
-            Text(valor, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: color)),
-            Text(' / $meta', style: const TextStyle(fontSize: 14, color: AppColors.textHint)),
+            Expanded(
+              child: Text(label, overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 13, color: Color(0xFF8FAF8F), fontWeight: FontWeight.w500)),
+            ),
+            Text(valor, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
+            Text(' / $meta', style: const TextStyle(fontSize: 13, color: AppColors.textHint)),
           ],
         ),
         const SizedBox(height: 4),
@@ -580,7 +848,18 @@ class _AyunoCard extends StatefulWidget {
   final bool activo;
   final Duration? duracion;
   final VoidCallback onTap;
-  const _AyunoCard({required this.activo, required this.duracion, required this.onTap});
+  final int horaInicioComida, minInicioComida, horaFinComida, minFinComida;
+  final VoidCallback onEditarVentana;
+  const _AyunoCard({
+    required this.activo,
+    required this.duracion,
+    required this.onTap,
+    required this.onEditarVentana,
+    this.horaInicioComida = 12,
+    this.minInicioComida  = 0,
+    this.horaFinComida    = 20,
+    this.minFinComida     = 0,
+  });
 
   @override
   State<_AyunoCard> createState() => _AyunoCardState();
@@ -637,6 +916,13 @@ class _AyunoCardState extends State<_AyunoCard> {
     super.dispose();
   }
 
+  String _fechaHoy() {
+    final d = DateTime.now();
+    const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    return '${dias[d.weekday % 7]}, ${d.day} ${meses[d.month - 1]}';
+  }
+
   String _formato(Duration d) {
     final h = d.inHours.toString().padLeft(2, '0');
     final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -672,24 +958,27 @@ class _AyunoCardState extends State<_AyunoCard> {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
+              GestureDetector(
+                onTap: widget.onEditarVentana,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.timer_outlined, color: Color(0xFFEF4444), size: 20),
                 ),
-                child: const Icon(Icons.timer_outlined, color: AppColors.blanco, size: 20),
               ),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Ayuno 16:8',
+                  const Text('Ayuno intermitente',
                     style: TextStyle(color: AppColors.blanco, fontWeight: FontWeight.w700, fontSize: 15)),
+                  Text(_fechaHoy(),
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 12, fontWeight: FontWeight.w600)),
                   Text(
-                    widget.activo
-                      ? (horasRestantes > 0 ? '$horasRestantes h para la meta' : '¡Meta alcanzada! 🎉')
-                      : 'Toca iniciar para activar',
+                    '🍽️ ${widget.horaInicioComida.toString().padLeft(2,'0')}:${widget.minInicioComida.toString().padLeft(2,'0')} — 🌙 ${widget.horaFinComida.toString().padLeft(2,'0')}:${widget.minFinComida.toString().padLeft(2,'0')}',
                     style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 11),
                   ),
                 ],

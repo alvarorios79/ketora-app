@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import '../../../../core/di/injection_container.dart';
+import '../../../../core/services/perfil_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../app/theme/app_colors.dart';
+
+String _calcSemana() {
+  final perfil = sl<PerfilService>().perfilActual;
+  if (perfil == null) return 'Semana 1';
+  final dias = DateTime.now().difference(perfil.fechaRegistro).inDays + 1;
+  return 'Semana ${((dias - 1) / 7).floor() + 1}';
+}
 
 /// Tab 4 — PROGRESO
 class ProgresoPage extends StatefulWidget {
@@ -20,6 +29,21 @@ class ProgresoPage extends StatefulWidget {
 class _ProgresoPageState extends State<ProgresoPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabCtrl;
+
+  String _diasEnKeto() {
+    final perfil = sl<PerfilService>().perfilActual;
+    if (perfil == null) return 'En keto 💪';
+    final dias = DateTime.now().difference(perfil.fechaRegistro).inDays + 1;
+    final semana = ((dias - 1) / 7).floor() + 1;
+    return 'Día $dias · Semana $semana 💪';
+  }
+
+  String _semanaActual() {
+    final perfil = sl<PerfilService>().perfilActual;
+    if (perfil == null) return 'Semana 1';
+    final dias = DateTime.now().difference(perfil.fechaRegistro).inDays + 1;
+    return 'Semana ${((dias - 1) / 7).floor() + 1}';
+  }
 
   @override
   void initState() {
@@ -77,7 +101,7 @@ class _ProgresoPageState extends State<ProgresoPage>
                                   color: Colors.white.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: const Text('14 días en keto 💪',
+                                child: Text(_diasEnKeto(),
                                   style: TextStyle(color: AppColors.blanco, fontSize: 15, fontWeight: FontWeight.w600)),
                               ),
                             ],
@@ -993,7 +1017,7 @@ class _FotasTabState extends State<_FotasTab> {
                 style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.5)),
               const SizedBox(height: 12),
               Row(children: [
-                _ChipFrecuencia('Semana 2', '💧 Agua'),
+                _ChipFrecuencia(_calcSemana(), '💧 Agua'),
                 const SizedBox(width: 6),
                 _ChipFrecuencia('Semana 4', '🔥 Grasa'),
                 const SizedBox(width: 6),

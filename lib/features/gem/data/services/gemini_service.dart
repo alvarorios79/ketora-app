@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Servicio que llama la API REST de Gemini directamente.
@@ -131,46 +132,66 @@ Perfil del usuario:
 
   void reiniciarChat() => _historial.clear();
 
+  static const String _visionUrl =
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+
+  /// Estima macros de un plato por nombre cuando no hay base de datos
+  Future<Map<String, double>> estimarMacrosPorNombre(String nombre) async {
+    final apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
+    final body = {
+      'contents': [{'parts': [{'text': 'You are a nutrition database. For the dish "$nombre", give the nutritional values for a typical serving as actually served (including all components like rice, potatoes, sides). Respond with EXACTLY 5 integers separated by commas, nothing else: calories,protein_g,fat_g,net_carbs_g,grams. No text, no labels, just numbers.'}]}],
+      'generationConfig': {'temperature': 0.0, 'maxOutputTokens': 32},
+    };
+    try {
+      final response = await _dio.post(_baseUrl, queryParameters: {'key': apiKey}, data: body,
+          options: Options(headers: {'Content-Type': 'application/json'}));
+      final texto = response.data['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '';
+      debugPrint('🍽️ Macros estimados: $texto');
+      final nums = texto.split(',').map((s) => double.tryParse(s.trim()) ?? 0).toList();
+      if (nums.length >= 4) {
+        return {
+          'kcal': nums[0],
+          'proteina_g': nums[1],
+          'grasas_g': nums[2],
+          'carbos_netos_g': nums[3],
+          'porcion_g': nums.length >= 5 ? nums[4] : 300.0,
+        };
+      }
+    } catch (e) { debugPrint('🍽️ Error estimación: $e'); }
+    return {};
+  }
+
   /// Analiza una imagen de comida y devuelve JSON con macros estimados
   Future<String> analizarFoto(List<int> imagenBytes) async {
     final apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
     final base64Img = base64Encode(imagenBytes);
 
     final body = {
-      'system_instruction': {
-        'parts': [{'text': _sistemaKeto}],
-      },
       'contents': [
         {
-          'role': 'user',
           'parts': [
             {
-              'inline_data': {
-                'mime_type': 'image/jpeg',
+              'text': 'List EACH separate food item visible in this image. One item per line in Spanish with estimated grams. Format: ingredient|grams. Example:\nLomo de res|150\nArepa de maíz|100\nAguacate|80\nOnly food items, nothing else.',
+            },
+            {
+              'inlineData': {
+                'mimeType': 'image/jpeg',
                 'data': base64Img,
               }
             },
-            {
-              'text': '''Analiza esta foto de comida y responde ÚNICAMENTE con un JSON válido con este formato exacto (sin texto adicional):
-{
-  "nombre": "nombre del plato o alimento",
-  "porcion_g": 300,
-  "kcal": 450,
-  "proteina_g": 35,
-  "grasas_g": 28,
-  "carbos_netos_g": 8,
-  "es_keto": true,
-  "descripcion": "breve descripción de 1 línea"
-}
-Estima los valores para una porción típica visible en la imagen. Si no puedes identificar la comida, usa nombre "Alimento no identificado" con valores en 0.'''
-            }
           ]
         }
       ],
       'generationConfig': {
-        'temperature': 0.2,
+        'temperature': 0.1,
         'maxOutputTokens': 512,
       },
+      'safetySettings': [
+        {'category': 'HARM_CATEGORY_HARASSMENT', 'threshold': 'BLOCK_NONE'},
+        {'category': 'HARM_CATEGORY_HATE_SPEECH', 'threshold': 'BLOCK_NONE'},
+        {'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold': 'BLOCK_NONE'},
+        {'category': 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold': 'BLOCK_NONE'},
+      ],
     };
 
     try {
@@ -180,9 +201,19 @@ Estima los valores para una porción típica visible en la imagen. Si no puedes 
         data: body,
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
-      return response.data['candidates']?[0]?['content']?['parts']?[0]?['text'] as String? ?? '{}';
+      final candidates = response.data['candidates'] as List?;
+      if (candidates == null || candidates.isEmpty) return '{}';
+      final parts = candidates[0]['content']?['parts'] as List?;
+      if (parts == null || parts.isEmpty) {
+        debugPrint('🍽️ Sin partes — finishReason: ${candidates[0]['finishReason']}');
+        return '{}';
+      }
+      final texto = parts[0]['text'] as String? ?? '{}';
+      debugPrint('🍽️ Gemini foto raw: $texto');
+      return texto;
     } catch (e) {
-      return '{}';
+      debugPrint('🍽️ Error foto: $e');
+      return '{"nombre":"Sin conexión","porcion_g":0,"kcal":0,"proteina_g":0,"grasas_g":0,"carbos_netos_g":0,"es_keto":false,"descripcion":"No se pudo analizar"}';
     }
   }
 }

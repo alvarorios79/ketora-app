@@ -17,6 +17,11 @@ class PerfilUsuario {
   final int proteinaG;
   final int carbosG;
   final DateTime fechaRegistro;
+  // Ventana de alimentación programada
+  final int horaInicioComida; // hora en que rompe el ayuno (ej: 12 = 12:00pm)
+  final int minInicioComida;  // minutos (ej: 30 = 12:30pm)
+  final int horaFinComida;    // hora en que termina de comer (ej: 19 = 7:00pm)
+  final int minFinComida;
 
   const PerfilUsuario({
     required this.uid,
@@ -34,7 +39,26 @@ class PerfilUsuario {
     required this.proteinaG,
     required this.carbosG,
     required this.fechaRegistro,
+    this.horaInicioComida = 12,
+    this.minInicioComida  = 0,
+    this.horaFinComida    = 20,
+    this.minFinComida     = 0,
   });
+
+  /// Duración del ayuno en horas
+  double get horasAyuno {
+    final inicio = horaFinComida * 60 + minFinComida;
+    final fin    = horaInicioComida * 60 + minInicioComida;
+    final diff   = fin <= inicio ? (fin + 1440) - inicio : fin - inicio;
+    return diff / 60;
+  }
+
+  /// Etiqueta de la ventana: "12:00 — 20:00 (16h ayuno)"
+  String get etiquetaVentana {
+    final ini = '${horaInicioComida.toString().padLeft(2,'0')}:${minInicioComida.toString().padLeft(2,'0')}';
+    final fin = '${horaFinComida.toString().padLeft(2,'0')}:${minFinComida.toString().padLeft(2,'0')}';
+    return '$ini — $fin';
+  }
 
   factory PerfilUsuario.fromMap(String uid, Map<String, dynamic> m) {
     return PerfilUsuario(
@@ -55,6 +79,10 @@ class PerfilUsuario {
       fechaRegistro: m['fechaRegistro'] != null
           ? (m['fechaRegistro'] as Timestamp).toDate()
           : DateTime.now(),
+      horaInicioComida: (m['horaInicioComida'] as num?)?.toInt() ?? 12,
+      minInicioComida:  (m['minInicioComida']  as num?)?.toInt() ?? 0,
+      horaFinComida:    (m['horaFinComida']    as num?)?.toInt() ?? 20,
+      minFinComida:     (m['minFinComida']     as num?)?.toInt() ?? 0,
     );
   }
 
@@ -72,7 +100,11 @@ class PerfilUsuario {
     'grasasG':     grasasG,
     'proteinaG':   proteinaG,
     'carbosG':     carbosG,
-    'fechaRegistro': Timestamp.fromDate(fechaRegistro),
+    'fechaRegistro':    Timestamp.fromDate(fechaRegistro),
+    'horaInicioComida': horaInicioComida,
+    'minInicioComida':  minInicioComida,
+    'horaFinComida':    horaFinComida,
+    'minFinComida':     minFinComida,
   };
 
   PerfilUsuario copyWith({
@@ -89,6 +121,10 @@ class PerfilUsuario {
     int?    grasasG,
     int?    proteinaG,
     int?    carbosG,
+    int?    horaInicioComida,
+    int?    minInicioComida,
+    int?    horaFinComida,
+    int?    minFinComida,
   }) => PerfilUsuario(
     uid:          uid,
     nombre:       nombre       ?? this.nombre,
@@ -104,7 +140,11 @@ class PerfilUsuario {
     grasasG:      grasasG      ?? this.grasasG,
     proteinaG:    proteinaG    ?? this.proteinaG,
     carbosG:      carbosG      ?? this.carbosG,
-    fechaRegistro: fechaRegistro,
+    fechaRegistro:    fechaRegistro,
+    horaInicioComida: horaInicioComida ?? this.horaInicioComida,
+    minInicioComida:  minInicioComida  ?? this.minInicioComida,
+    horaFinComida:    horaFinComida    ?? this.horaFinComida,
+    minFinComida:     minFinComida     ?? this.minFinComida,
   );
 }
 
@@ -118,7 +158,7 @@ class PerfilService {
 
   PerfilUsuario? get perfilActual => _perfil;
 
-  CollectionReference<Map<String, dynamic>> get _col => _db.collection('usuarios');
+  CollectionReference<Map<String, dynamic>> get _col => _db.collection('users');
 
   /// Carga el perfil del usuario desde Firestore. Retorna null si no existe.
   Future<PerfilUsuario?> cargarPerfil(String uid) async {

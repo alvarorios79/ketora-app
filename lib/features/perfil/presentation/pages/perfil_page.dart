@@ -99,7 +99,7 @@ class _PerfilPageState extends State<PerfilPage> {
     if (photo == null || !mounted) return;
 
     final dir = await getApplicationDocumentsDirectory();
-    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
     final destPath = '${dir.path}/profile_$uid.jpg';
     await File(photo.path).copy(destPath);
 
@@ -253,12 +253,12 @@ class _PerfilPageState extends State<PerfilPage> {
                           _ActionRow(
                             icon: Icons.notifications_rounded,
                             label: 'Notificaciones',
-                            onTap: () {},
+                            onTap: () => _mostrarNotificaciones(),
                           ),
                           _ActionRow(
                             icon: Icons.privacy_tip_rounded,
                             label: 'Privacidad y datos',
-                            onTap: () {},
+                            onTap: () => _mostrarPrivacidad(),
                           ),
                         ]),
                         const SizedBox(height: 12),
@@ -292,6 +292,106 @@ class _PerfilPageState extends State<PerfilPage> {
                 ),
               ],
             ),
+    );
+  }
+
+  void _mostrarNotificaciones() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Color(0xFF182318),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('🔔 Notificaciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
+          const SizedBox(height: 20),
+          _SwitchTile('Recordatorio de ayuno', '16h, 14h, 12h — hitos del ayuno', 'notif_ayuno', true),
+          _SwitchTile('Motivación diaria', 'Un mensaje keto cada mañana', 'notif_motivacion', true),
+          _SwitchTile('Registro de agua', 'Recordatorio cada 2 horas', 'notif_agua', false),
+          _SwitchTile('Logros desbloqueados', 'Cuando alcances un hito', 'notif_logros', true),
+          const SizedBox(height: 12),
+          SizedBox(width: double.infinity, child: ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Guardar preferencias'),
+          )),
+        ]),
+      ),
+    );
+  }
+
+  void _mostrarPrivacidad() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (_) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Color(0xFF182318),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('🔒 Privacidad y datos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
+          const SizedBox(height: 16),
+          _InfoTile('📊 Tus datos', 'Tu información está cifrada en Firebase (Google) y nunca se comparte con terceros.'),
+          _InfoTile('🗂️ Qué guardamos', 'Perfil, alimentos registrados, glucosa, peso, medidas y fotos de progreso.'),
+          _InfoTile('🌐 Servicios externos', 'Usamos Gemini (Google) para el coach IA y Open Food Facts para datos nutricionales.'),
+          const SizedBox(height: 16),
+          const Divider(color: Color(0xFF2A3D2A)),
+          const SizedBox(height: 12),
+          // Eliminar datos
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              _confirmarEliminarDatos();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2B0F0F),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.4)),
+              ),
+              child: const Row(children: [
+                Icon(Icons.delete_forever_rounded, color: Color(0xFFEF4444)),
+                SizedBox(width: 12),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Eliminar todos mis datos', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFFEF4444))),
+                  Text('Borra tu perfil y registros de KETORA permanentemente', style: TextStyle(fontSize: 12, color: Color(0xFF8FAF8F))),
+                ])),
+              ]),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  void _confirmarEliminarDatos() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF182318),
+        title: const Text('¿Eliminar todos tus datos?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+        content: const Text('Esta acción es permanente. Se borrarán tu perfil, registros de alimentos, glucosa, peso y medidas.', style: TextStyle(color: Color(0xFF8FAF8F))),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: Color(0xFF8FAF8F)))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFEF4444), foregroundColor: Colors.white),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              // Cerrar sesión y limpiar
+              await FirebaseAuth.instance.signOut();
+              if (mounted) context.go(AppRoutes.onboarding);
+            },
+            child: const Text('Eliminar y salir'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -487,122 +587,215 @@ class _EditarPerfilSheet extends StatefulWidget {
 class _EditarPerfilSheetState extends State<_EditarPerfilSheet> {
   late final TextEditingController _nombreCtrl;
   late double _pesoKg;
-  late int _kcal;
+  late double _alturaCm;
+  late int _edad;
+  late String _sexo;
+  late String _objetivo;
+  late String _actividad;
   bool _guardando = false;
+
+  static const _objetivos = ['Perder peso', 'Más energía', 'Control glucémico', 'Claridad mental'];
+  static const _actividades = ['Sedentario', 'Ligero', 'Moderado', 'Activo', 'Muy activo'];
+  static const _sexos = ['Masculino', 'Femenino'];
 
   @override
   void initState() {
     super.initState();
     _nombreCtrl = TextEditingController(text: widget.perfil.nombre);
-    _pesoKg = widget.perfil.pesoKg;
-    _kcal   = widget.perfil.kcal;
+    _pesoKg    = widget.perfil.pesoKg;
+    _alturaCm  = widget.perfil.alturaCm;
+    _edad      = widget.perfil.edad;
+    _sexo      = widget.perfil.sexo;
+    _objetivo  = widget.perfil.objetivo;
+    _actividad = widget.perfil.actividad;
   }
 
   @override
-  void dispose() {
-    _nombreCtrl.dispose();
-    super.dispose();
+  void dispose() { _nombreCtrl.dispose(); super.dispose(); }
+
+  int _calcularKcal() {
+    double tmb = _sexo == 'Masculino'
+        ? (10 * _pesoKg) + (6.25 * _alturaCm) - (5 * _edad) + 5
+        : (10 * _pesoKg) + (6.25 * _alturaCm) - (5 * _edad) - 161;
+    final factores = {'Sedentario': 1.2, 'Ligero': 1.375, 'Moderado': 1.55, 'Activo': 1.725, 'Muy activo': 1.9};
+    return (tmb * (factores[_actividad] ?? 1.375) * 0.8).round();
   }
 
   Future<void> _guardar() async {
     setState(() => _guardando = true);
+    final kcal = _calcularKcal();
     final updated = widget.perfil.copyWith(
-      nombre: _nombreCtrl.text.trim().isNotEmpty ? _nombreCtrl.text.trim() : widget.perfil.nombre,
-      pesoKg: _pesoKg,
-      kcal:   _kcal,
-      // Recalcular macros proporcionales
-      grasasG:   (_kcal * 0.70 / 9).round(),
-      proteinaG: (_kcal * 0.25 / 4).round(),
-      carbosG:   (_kcal * 0.05 / 4).round(),
+      nombre:    _nombreCtrl.text.trim().isNotEmpty ? _nombreCtrl.text.trim() : widget.perfil.nombre,
+      pesoKg:    _pesoKg,
+      alturaCm:  _alturaCm,
+      edad:      _edad,
+      sexo:      _sexo,
+      objetivo:  _objetivo,
+      actividad: _actividad,
+      kcal:      kcal,
+      grasasG:   (kcal * 0.70 / 9).round(),
+      proteinaG: (kcal * 0.25 / 4).round(),
+      carbosG:   (kcal * 0.05 / 4).round(),
     );
-    try {
-      await sl<PerfilService>().guardarPerfil(updated);
-    } catch (_) {}
-    if (mounted) {
-      widget.onGuardado(updated);
-      Navigator.pop(context);
-    }
+    try { await sl<PerfilService>().guardarPerfil(updated); } catch (_) {}
+    if (mounted) { widget.onGuardado(updated); Navigator.pop(context); }
+  }
+
+  Widget _slider(String label, double valor, double min, double max, int div, Color color, ValueChanged<double> onChanged) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+      SliderTheme(
+        data: SliderTheme.of(context).copyWith(activeTrackColor: color, thumbColor: color, overlayColor: color.withOpacity(0.15), trackHeight: 5),
+        child: Slider(value: valor, min: min, max: max, divisions: div, onChanged: onChanged),
+      ),
+    ]);
+  }
+
+  Widget _selector(String label, List<String> opciones, String selec, ValueChanged<String> onChanged) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF8FAF8F))),
+      const SizedBox(height: 8),
+      Wrap(spacing: 8, children: opciones.map((op) {
+        final sel = selec == op;
+        return GestureDetector(
+          onTap: () => onChanged(op),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: sel ? AppColors.verde : const Color(0xFF0D1510),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: sel ? AppColors.verde : const Color(0xFF2A3D2A)),
+            ),
+            child: Text(op, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: sel ? Colors.white : const Color(0xFF8FAF8F))),
+          ),
+        );
+      }).toList()),
+      const SizedBox(height: 12),
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
+    final kcalEstimado = _calcularKcal();
     return Container(
-      height: MediaQuery.of(context).size.height * 0.65,
-      decoration: const BoxDecoration(
-        color: const Color(0xFF182318),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      padding: EdgeInsets.fromLTRB(24, 16, 24,
-          MediaQuery.of(context).viewInsets.bottom + 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(width: 40, height: 4,
-              decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2))),
+      height: MediaQuery.of(context).size.height * 0.92,
+      decoration: const BoxDecoration(color: Color(0xFF182318), borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      child: Column(children: [
+        Container(margin: const EdgeInsets.only(top: 12), width: 40, height: 4,
+          decoration: BoxDecoration(color: const Color(0xFF2A3D2A), borderRadius: BorderRadius.circular(2))),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+          child: Row(children: [
+            const Text('Actualizar mis datos', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: Colors.white)),
+            const Spacer(),
+            IconButton(icon: const Icon(Icons.close, color: Color(0xFF8FAF8F)), onPressed: () => Navigator.pop(context)),
+          ]),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(24, 8, 24, MediaQuery.of(context).viewInsets.bottom + 24),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Nombre
+              TextField(
+                controller: _nombreCtrl,
+                textCapitalization: TextCapitalization.words,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(labelText: 'Tu nombre', prefixIcon: Icon(Icons.person_rounded, color: AppColors.verde)),
+              ),
+              const SizedBox(height: 16),
+              // Sexo
+              _selector('Sexo', _sexos, _sexo, (v) => setState(() => _sexo = v)),
+              // Objetivo
+              _selector('Objetivo principal', _objetivos, _objetivo, (v) => setState(() => _objetivo = v)),
+              // Edad
+              _slider('Edad: $_edad años', _edad.toDouble(), 15, 80, 65, AppColors.info, (v) => setState(() => _edad = v.round())),
+              // Peso
+              _slider('Peso: ${_pesoKg.toStringAsFixed(1)} kg', _pesoKg, 40, 200, 320, AppColors.verde, (v) => setState(() => _pesoKg = v)),
+              // Altura
+              _slider('Altura: ${_alturaCm.toStringAsFixed(0)} cm', _alturaCm, 140, 220, 160, AppColors.macroProtein, (v) => setState(() => _alturaCm = v)),
+              // Actividad
+              _selector('Nivel de actividad', _actividades, _actividad, (v) => setState(() => _actividad = v)),
+              // Resumen macros calculados
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: const Color(0xFF0D1510), borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.verde.withOpacity(0.3))),
+                child: Column(children: [
+                  const Text('Tus macros calculados', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF8FAF8F))),
+                  const SizedBox(height: 8),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                    Column(children: [const Text('Calorías', style: TextStyle(fontSize: 11, color: Color(0xFF8FAF8F))), Text('$kcalEstimado kcal', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFC9A227)))]),
+                    Column(children: [const Text('Grasas', style: TextStyle(fontSize: 11, color: Color(0xFF8FAF8F))), Text('${(kcalEstimado * 0.70 / 9).round()}g', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFFC9A227)))]),
+                    Column(children: [const Text('Proteína', style: TextStyle(fontSize: 11, color: Color(0xFF8FAF8F))), Text('${(kcalEstimado * 0.25 / 4).round()}g', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF3B82F6)))]),
+                    Column(children: [const Text('Carbos', style: TextStyle(fontSize: 11, color: Color(0xFF8FAF8F))), Text('${(kcalEstimado * 0.05 / 4).round()}g', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.verdeMedio))]),
+                  ]),
+                ]),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _guardando ? null : _guardar,
+                  child: _guardando
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Text('Guardar todos los cambios'),
+                ),
+              ),
+            ]),
           ),
-          const SizedBox(height: 20),
-          const Text('Editar perfil',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
-          const SizedBox(height: 20),
-
-          // Nombre
-          TextField(
-            controller: _nombreCtrl,
-            textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(
-              labelText: 'Nombre',
-              prefixIcon: Icon(Icons.person_rounded, color: AppColors.verde),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Peso
-          Text('Peso: ${_pesoKg.toStringAsFixed(1)} kg',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: AppColors.verde,
-              thumbColor: AppColors.verde,
-              overlayColor: AppColors.verde.withValues(alpha: 0.15),
-              trackHeight: 5,
-            ),
-            child: Slider(
-              value: _pesoKg, min: 40, max: 200,
-              divisions: 320,
-              onChanged: (v) => setState(() => _pesoKg = v),
-            ),
-          ),
-
-          // Calorías
-          Text('Calorías objetivo: $_kcal kcal/día',
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: AppColors.oro,
-              thumbColor: AppColors.oro,
-              overlayColor: AppColors.oro.withValues(alpha: 0.15),
-              trackHeight: 5,
-            ),
-            child: Slider(
-              value: _kcal.toDouble(), min: 1200, max: 3500,
-              divisions: 230,
-              onChanged: (v) => setState(() => _kcal = v.round()),
-            ),
-          ),
-
-          const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _guardando ? null : _guardar,
-              child: _guardando
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: AppColors.blanco, strokeWidth: 2))
-                  : const Text('Guardar cambios'),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
+}
+
+class _SwitchTile extends StatefulWidget {
+  final String titulo, subtitulo, prefKey;
+  final bool defecto;
+  const _SwitchTile(this.titulo, this.subtitulo, this.prefKey, this.defecto);
+  @override State<_SwitchTile> createState() => _SwitchTileState();
+}
+class _SwitchTileState extends State<_SwitchTile> {
+  bool _val = true;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((p) {
+      if (mounted) setState(() => _val = p.getBool(widget.prefKey) ?? widget.defecto);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: Row(children: [
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(widget.titulo, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
+        Text(widget.subtitulo, style: const TextStyle(fontSize: 12, color: Color(0xFF8FAF8F))),
+      ])),
+      Switch(
+        value: _val,
+        onChanged: (v) async {
+          setState(() => _val = v);
+          final p = await SharedPreferences.getInstance();
+          await p.setBool(widget.prefKey, v);
+        },
+        activeColor: AppColors.verdeMedio,
+      ),
+    ]),
+  );
+}
+
+class _InfoTile extends StatelessWidget {
+  final String titulo, contenido;
+  const _InfoTile(this.titulo, this.contenido);
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(titulo, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+      const SizedBox(height: 3),
+      Text(contenido, style: const TextStyle(fontSize: 13, color: Color(0xFF8FAF8F), height: 1.4)),
+    ]),
+  );
 }

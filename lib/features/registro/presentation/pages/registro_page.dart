@@ -348,10 +348,6 @@ class _AlimentoRow extends StatelessWidget {
           Text('${item.kcal} kcal',
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.verde)),
           const SizedBox(width: 8),
-          GestureDetector(
-            onTap: () {},
-            child: const Icon(Icons.close_rounded, color: Color(0xFF4A6B4A), size: 16),
-          ),
         ],
       ),
     );

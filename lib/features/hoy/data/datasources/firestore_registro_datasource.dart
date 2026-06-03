@@ -11,13 +11,13 @@ class FirestoreRegistroDatasource {
   FirestoreRegistroDatasource({FirebaseFirestore? db})
       : _db = db ?? FirebaseFirestore.instance;
 
-  // ── Referencia a la colección ────────────────────────────────
-  CollectionReference<Map<String, dynamic>> get _col =>
-      _db.collection('registros_diarios');
+  // ── Referencia a la colección — users/{uid}/registros_diarios/{fecha}
+  CollectionReference<Map<String, dynamic>> _col(String uid) =>
+      _db.collection('users').doc(uid).collection('registros_diarios');
 
   DocumentReference<Map<String, dynamic>> _docRef(
       String uid, DateTime fecha) =>
-      _col.doc(RegistroDiarioModel.docId(uid: uid, fecha: fecha));
+      _col(uid).doc(fecha.toIso8601String().substring(0, 10));
 
   // ── Leer un registro ─────────────────────────────────────────
 

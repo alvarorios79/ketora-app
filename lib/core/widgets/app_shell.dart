@@ -358,10 +358,15 @@ class _IconFoodPickerState extends State<_IconFoodPicker> {
       _FoodItem('🫙', 'Aceitunas',     145, 1, 1,  15),
     ]),
     _FoodCategory(label: 'Bebidas', items: [
-      _FoodItem('☕', 'Café negro',      2, 0, 0,  0),
-      _FoodItem('🍵', 'Té sin azúcar',   2, 0, 0,  0),
-      _FoodItem('💧', 'Agua',             0, 0, 0,  0),
-      _FoodItem('🧃', 'Electrolitos',    10, 2, 0,  0),
+      _FoodItem('☕', 'Café negro',        2,  0, 0,  0),
+      _FoodItem('☕', 'Café con leche',   60,  5, 3,  3),
+      _FoodItem('🍵', 'Té verde',          2,  0, 0,  0),
+      _FoodItem('💧', 'Agua',              0,  0, 0,  0),
+      _FoodItem('🥛', 'Leche entera',    150, 11, 8,  8),
+      _FoodItem('🥛', 'Leche almendras',  40,  2, 1,  3),
+      _FoodItem('🥥', 'Leche de coco',   120,  2, 12, 1),
+      _FoodItem('🧃', 'Electrolitos',     10,  2, 0,  0),
+      _FoodItem('💪', 'Proteína polvo',  120,  3, 25, 2),
     ]),
   ];
 
